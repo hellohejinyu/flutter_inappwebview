@@ -1,27 +1,35 @@
 import 'dart:collection';
-import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:io';
 
-import '../find_interaction/find_interaction_controller.dart';
-import '../pull_to_refresh/pull_to_refresh_controller.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/src/in_app_webview/_static_channel.dart';
 
 import '../context_menu.dart';
-import '../types/main.dart';
-
-import '../web_uri.dart';
-import 'in_app_webview_controller.dart';
-import 'in_app_webview_settings.dart';
-import 'headless_in_app_webview.dart';
-import 'in_app_webview.dart';
+import '../debug_logging_settings.dart';
+import '../find_interaction/find_interaction_controller.dart';
 import '../in_app_browser/in_app_browser.dart';
 import '../print_job/main.dart';
-
-import '../debug_logging_settings.dart';
+import '../pull_to_refresh/pull_to_refresh_controller.dart';
+import '../types/main.dart';
+import '../web_uri.dart';
+import 'headless_in_app_webview.dart';
+import 'in_app_webview.dart';
+import 'in_app_webview_controller.dart';
+import 'in_app_webview_settings.dart';
 
 ///{@template flutter_inappwebview.WebView}
 ///Abstract class that represents a WebView. Used by [InAppWebView], [HeadlessInAppWebView] and the WebView of [InAppBrowser].
 ///{@endtemplate}
 abstract class WebView {
+  static MethodChannel _staticChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
+
+  static Future<bool?> init() {
+    if (!Platform.isAndroid) {
+      return Future.value(true);
+    }
+    return _staticChannel.invokeMethod("init");
+  }
+
   ///Debug settings used by [InAppWebView], [HeadlessInAppWebView] and [InAppBrowser].
   ///The default value excludes the [WebView.onScrollChanged], [WebView.onOverScrolled] and [WebView.onReceivedIcon] events.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings(
